@@ -3180,9 +3180,9 @@ input {
 
   /* Footer - Mobile Override */
   .footer-links {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: var(--space-sm) !important;
-    margin-bottom: var(--space-lg);
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: var(--space-xs) !important;
+    margin-bottom: var(--space-md);
   }
 
   .footer-col {
@@ -3190,23 +3190,23 @@ input {
   }
 
   .footer-col h4 {
-    font-size: 0.75rem !important;
-    margin-bottom: var(--space-xs) !important;
-    padding-bottom: var(--space-xs) !important;
+    font-size: 0.7rem !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 4px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .footer-col ul {
-    gap: 2px !important;
+    gap: 1px !important;
   }
 
   .footer-col a {
-    font-size: 0.6875rem !important;
-    padding: 2px 0 !important;
-    line-height: 1.4 !important;
+    font-size: 0.625rem !important;
+    padding: 1px 0 !important;
+    line-height: 1.3 !important;
   }
 
   .footer {
-    padding: var(--space-xl) 0 var(--space-md) !important;
+    padding: var(--space-lg) 0 var(--space-sm) !important;
   }
 }
