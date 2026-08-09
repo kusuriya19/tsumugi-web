@@ -1361,7 +1361,11 @@ input {
   /* Product Grid Responsive */
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+    gap: var(--space-lg);
+  }
+
+  .product-grid .product-card-info {
+    padding: var(--space-sm);
   }
 
   .product-grid-4 {
@@ -1473,11 +1477,11 @@ input {
 @media (max-width: 480px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
+    gap: var(--space-md);
   }
 
   .product-grid .product-card-info {
-    padding: var(--space-sm);
+    padding: var(--space-xs);
   }
 
   .product-name {
@@ -1490,11 +1494,11 @@ input {
   }
 
   .product-price {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
 
   .product-card-series {
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
   }
 }
 
@@ -2260,11 +2264,20 @@ input {
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 .product-grid .product-card {
   position: relative;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.product-grid .product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .product-grid .product-wishlist {
@@ -2774,6 +2787,7 @@ input {
 
 .product-card-img {
   overflow: hidden;
+  border-radius: var(--radius-md);
 }
 
 .product-card-img .placeholder-img {
@@ -2785,35 +2799,33 @@ input {
 }
 
 .product-card-info {
-  padding: var(--space-lg);
+  padding: var(--space-md) var(--space-sm);
 }
 
 .product-card-series {
-  display: inline-block;
-  font-size: 0.6875rem;
+  display: block;
+  font-size: 0.75rem;
   font-weight: 400;
-  letter-spacing: 0.12em;
-  color: var(--color-gold);
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
   margin-bottom: var(--space-xs);
 }
 
 .product-card-name {
   font-family: var(--font-serif-cn);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 400;
   letter-spacing: 0.04em;
-  color: var(--color-brown);
-  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
   line-height: 1.5;
-  word-break: keep-all;
-  overflow-wrap: break-word;
 }
 
 .product-card-price {
-  font-size: 0.875rem;
-  color: var(--color-gold);
-  font-weight: 400;
+  font-size: 0.9375rem;
+  color: var(--color-brown);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* ============================================
