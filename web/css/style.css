@@ -3181,20 +3181,32 @@ input {
   /* Footer - Mobile Override */
   .footer-links {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: var(--space-md) !important;
+    gap: var(--space-sm) !important;
+    margin-bottom: var(--space-lg);
   }
 
-  .footer-links ul {
+  .footer-col {
+    padding: 0 !important;
+  }
+
+  .footer-col h4 {
+    font-size: 0.75rem !important;
+    margin-bottom: var(--space-xs) !important;
+    padding-bottom: var(--space-xs) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .footer-col ul {
     gap: 2px !important;
   }
 
-  .footer-links h4 {
-    font-size: 0.8125rem !important;
-    margin-bottom: var(--space-xs) !important;
+  .footer-col a {
+    font-size: 0.6875rem !important;
+    padding: 2px 0 !important;
+    line-height: 1.4 !important;
   }
 
-  .footer-links a {
-    font-size: 0.75rem !important;
-    padding: 2px 0 !important;
+  .footer {
+    padding: var(--space-xl) 0 var(--space-md) !important;
   }
 }
