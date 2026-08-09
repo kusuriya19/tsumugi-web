@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="紬 TSUMUGI 購物車 — 檢視您選購的商品與訂單摘要。">
+  <meta property="og:title" content="購物車｜紬 TSUMUGI">
+  <meta property="og:description" content="檢視您選購的商品與訂單摘要。">
+  <meta property="og:image" content="asset/og-image.svg">
+  <meta property="og:type" content="website">
+  <title>購物車｜紬 TSUMUGI</title>
+  <link rel="icon" type="image/svg+xml" href="asset/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ============================================
+       Cart Page
+       ============================================ */
+
+    .cart-page {
+      padding-top: calc(var(--header-height) + var(--space-4xl));
+      padding-bottom: var(--space-5xl);
+    }
+
+    .page-title-section {
+      text-align: center;
+      margin-bottom: var(--space-4xl);
+    }
+
+    .page-title-section h1 {
+      font-family: var(--font-serif-cn);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 400;
+      color: var(--color-brown);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .page-title-section .page-subtitle {
+      font-family: var(--font-serif-en);
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--color-text-light);
+      letter-spacing: 0.12em;
+    }
+
+    /* Cart Grid */
+    .cart-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: var(--space-3xl);
+      align-items: start;
+    }
+
+    /* Cart Items */
+    .cart-items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-light);
+      border-radius: var(--radius-md);
+      transition: box-shadow var(--transition-base);
+    }
+
+    .cart-item:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .cart-item-img {
+      width: 100px;
+      height: 100px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .cart-item-img .placeholder-img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1/1;
+    }
+
+    .cart-item-details {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      position: relative;
+    }
+
+    .cart-item-name {
+      font-family: var(--font-serif-cn);
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--color-text);
+      letter-spacing: 0.04em;
+    }
+
+    .cart-item-price {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-gray);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      color: var(--color-text-light);
+      transition: all var(--transition-fast);
+    }
+
+    .qty-btn:hover {
+      border-color: var(--color-brown);
+      color: var(--color-brown);
+    }
+
+    .cart-item-qty {
+      width: 40px;
+      height: 32px;
+      text-align: center;
+      border: 1px solid var(--color-gray);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      color: var(--color-text);
+      background: var(--color-white);
+      font-family: var(--font-sans);
+    }
+
+    .cart-item-subtotal {
+      margin-top: auto;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--color-brown);
+    }
+
+    .cart-item-remove {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--color-text-muted);
+      transition: all var(--transition-fast);
+    }
+
+    .cart-item-remove:hover {
+      color: var(--color-pink);
+      background: var(--color-cream);
+    }
+
+    /* Order Summary */
+    .order-summary {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-xl));
+      padding: var(--space-xl);
+      background: var(--color-cream);
+      border-radius: var(--radius-lg);
+    }
+
+    .order-summary h2 {
+      font-family: var(--font-serif-cn);
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--color-brown);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--color-gray-light);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) 0;
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+    }
+
+    .summary-row.total {
+      padding-top: var(--space-md);
+      margin-top: var(--space-md);
+      border-top: 1px solid var(--color-gray);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--color-brown);
+    }
+
+    .summary-row.total .summary-value {
+      font-family: var(--font-serif-cn);
+      font-size: 1.25rem;
+    }
+
+    .coupon-group {
+      display: flex;
+      gap: var(--space-sm);
+      margin: var(--space-lg) 0;
+    }
+
+    .coupon-group input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--color-gray);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      background: var(--color-white);
+      color: var(--color-text);
+      transition: border-color var(--transition-fast);
+    }
+
+    .coupon-group input:focus {
+      outline: none;
+      border-color: var(--color-gold);
+    }
+
+    .coupon-group input::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .coupon-apply {
+      padding: 10px 16px;
+      border: 1px solid var(--color-brown);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: var(--color-brown);
+      background: var(--color-white);
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .coupon-apply:hover {
+      background: var(--color-brown);
+      color: var(--color-white);
+    }
+
+    .checkout-btn {
+      display: block;
+      width: 100%;
+      margin-top: var(--space-lg);
+    }
+
+    .continue-shopping {
+      display: block;
+      text-align: center;
+      margin-top: var(--space-md);
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+      letter-spacing: 0.06em;
+    }
+
+    .continue-shopping:hover {
+      color: var(--color-gold);
+    }
+
+    /* Empty Cart State */
+    .cart-empty {
+      display: none;
+      text-align: center;
+      padding: var(--space-5xl) var(--space-lg);
+    }
+
+    .cart-empty.visible {
+      display: block;
+    }
+
+    .cart-empty-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto var(--space-xl);
+      color: var(--color-gray);
+    }
+
+    .cart-empty h2 {
+      font-family: var(--font-serif-cn);
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--color-text-light);
+      margin-bottom: var(--space-lg);
+      letter-spacing: 0.06em;
+    }
+
+    .cart-empty .btn {
+      margin-top: var(--space-md);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .cart-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+
+      .order-summary {
+        position: static;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .cart-page {
+        padding-top: calc(var(--header-height) + var(--space-2xl));
+      }
+
+      .cart-item {
+        grid-template-columns: 80px 1fr;
+        gap: var(--space-md);
+        padding: var(--space-md);
+      }
+
+      .cart-item-img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="template-header"></div>
+
+  <main class="cart-page">
+    <div class="container">
+
+      <!-- Page Title -->
+      <div class="page-title-section fade-in">
+        <h1>購物車</h1>
+        <p class="page-subtitle">Shopping Cart</p>
+      </div>
+
+      <!-- Cart Content -->
+      <div class="cart-grid" id="cartContent">
+
+        <!-- Left: Cart Items -->
+        <div class="cart-items">
+          <!-- Cart items will be loaded dynamically from localStorage -->
+        </div>
+
+        <!-- Right: Order Summary -->
+        <aside class="order-summary fade-in">
+          <h2>訂單摘要</h2>
+          <div class="summary-row">
+            <span>小計</span>
+            <span>NT$ 2,920</span>
+          </div>
+          <div class="summary-row">
+            <span>運費</span>
+            <span>NT$ 60</span>
+          </div>
+          <div class="coupon-group">
+            <input type="text" placeholder="折扣碼" aria-label="輸入折扣碼">
+            <button class="coupon-apply">套用</button>
+          </div>
+          <div class="summary-row total">
+            <span>總計</span>
+            <span class="summary-value">NT$ 2,980</span>
+          </div>
+          <button class="btn btn-primary checkout-btn">前往結帳</button>
+          <a href="collections.html" class="continue-shopping">繼續選購 →</a>
+        </aside>
+
+      </div>
+
+      <!-- Empty Cart State -->
+      <div class="cart-empty" id="cartEmpty">
+        <div class="cart-empty-icon">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <h2>購物車是空的</h2>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem;">還沒有挑選任何商品</p>
+        <a href="collections.html" class="btn btn-primary">開始選購</a>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="template-footer"></div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/templates.js"></script>
+  <script>
+    TSUMUGI.Templates.init('cart.html');
+  </script>
+  <script src="js/main.js"></script>
+  <script>
+    (function () {
+      var cartContent = document.getElementById('cartContent');
+      var cartEmpty = document.getElementById('cartEmpty');
+      var cartItemsContainer = document.querySelector('.cart-items');
+      var shipping = 60;
+
+      function formatPrice(n) {
+        return 'NT$ ' + n.toLocaleString();
+      }
+
+      function loadCart() {
+        var cart = JSON.parse(localStorage.getItem('tsumugi_cart') || '[]');
+        
+        if (cart.length === 0) {
+          cartContent.style.display = 'none';
+          cartEmpty.classList.add('visible');
+          return;
+        }
+        
+        cartItemsContainer.innerHTML = '';
+        
+        cart.forEach(function(item, index) {
+          var priceNum = parseInt(item.price.replace(/[^0-9]/g, ''), 10);
+          var itemHTML = 
+            '<div class="cart-item fade-in visible" data-index="' + index + '">' +
+              '<div class="cart-item-img">' +
+                '<div class="placeholder-img" style="background: linear-gradient(135deg, #F8F4EE 0%, #E8B7C1 100%); aspect-ratio: 1/1;">' +
+                  '<svg width="32" height="32" viewBox="0 0 100 100" fill="none">' +
+                    '<circle cx="50" cy="40" r="15" fill="#D79A9A" opacity="0.7"/>' +
+                    '<circle cx="40" cy="55" r="12" fill="#E8B7C1" opacity="0.6"/>' +
+                    '<circle cx="60" cy="55" r="12" fill="#E8B7C1" opacity="0.6"/>' +
+                  '</svg>' +
+                '</div>' +
+              '</div>' +
+              '<div class="cart-item-details">' +
+                '<button class="cart-item-remove" aria-label="移除商品" data-index="' + index + '">' +
+                  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>' +
+                '<h3 class="cart-item-name">' + item.name + '</h3>' +
+                '<p class="cart-item-price">' + item.price + '</p>' +
+                '<div class="cart-item-controls">' +
+                  '<button class="qty-btn" data-action="decrease" aria-label="減少數量">−</button>' +
+                  '<input type="number" class="cart-item-qty" value="' + item.quantity + '" min="1" max="10" aria-label="數量">' +
+                  '<button class="qty-btn" data-action="increase" aria-label="增加數量">+</button>' +
+                '</div>' +
+                '<p class="cart-item-subtotal">小計：' + formatPrice(priceNum * item.quantity) + '</p>' +
+              '</div>' +
+            '</div>';
+          
+          cartItemsContainer.insertAdjacentHTML('beforeend', itemHTML);
+        });
+        
+        attachCartEvents();
+        recalcAll();
+      }
+
+      function attachCartEvents() {
+        var items = document.querySelectorAll('.cart-item');
+        
+        items.forEach(function (item) {
+          var decreaseBtn = item.querySelector('[data-action="decrease"]');
+          var increaseBtn = item.querySelector('[data-action="increase"]');
+          var qtyInput = item.querySelector('.cart-item-qty');
+          var removeBtn = item.querySelector('.cart-item-remove');
+
+          decreaseBtn.addEventListener('click', function () {
+            var val = parseInt(qtyInput.value, 10) || 1;
+            if (val > 1) {
+              qtyInput.value = val - 1;
+              recalcAll();
+              saveCartState();
+            }
+          });
+
+          increaseBtn.addEventListener('click', function () {
+            var val = parseInt(qtyInput.value, 10) || 1;
+            if (val < 10) {
+              qtyInput.value = val + 1;
+              recalcAll();
+              saveCartState();
+            }
+          });
+
+          qtyInput.addEventListener('change', function () {
+            var val = parseInt(this.value, 10);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > 10) val = 10;
+            this.value = val;
+            recalcAll();
+            saveCartState();
+          });
+
+          removeBtn.addEventListener('click', function () {
+            var index = parseInt(this.getAttribute('data-index'), 10);
+            var cart = JSON.parse(localStorage.getItem('tsumugi_cart') || '[]');
+            cart.splice(index, 1);
+            localStorage.setItem('tsumugi_cart', JSON.stringify(cart));
+            loadCart();
+            updateHeaderCartCount();
+          });
+        });
+      }
+
+      function saveCartState() {
+        var cart = JSON.parse(localStorage.getItem('tsumugi_cart') || '[]');
+        var items = document.querySelectorAll('.cart-item');
+        
+        items.forEach(function(item, index) {
+          if (cart[index]) {
+            cart[index].quantity = parseInt(item.querySelector('.cart-item-qty').value, 10);
+          }
+        });
+        
+        localStorage.setItem('tsumugi_cart', JSON.stringify(cart));
+      }
+
+      function updateHeaderCartCount() {
+        var cart = JSON.parse(localStorage.getItem('tsumugi_cart') || '[]');
+        var totalItems = cart.reduce(function(sum, item) {
+          return sum + item.quantity;
+        }, 0);
+        
+        var cartCountEl = document.getElementById('cartCount');
+        if (cartCountEl) {
+          cartCountEl.textContent = totalItems;
+          cartCountEl.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+      }
+
+      function recalcAll() {
+        var total = 0;
+        var hasItems = false;
+        var items = document.querySelectorAll('.cart-item');
+
+        items.forEach(function (item) {
+          if (item.style.display === 'none') return;
+          hasItems = true;
+
+          var priceText = item.querySelector('.cart-item-price').textContent;
+          var price = parseInt(priceText.replace(/[^0-9]/g, ''), 10);
+          var qtyInput = item.querySelector('.cart-item-qty');
+          var qty = parseInt(qtyInput.value, 10) || 1;
+          var subtotal = price * qty;
+
+          item.querySelector('.cart-item-subtotal').textContent = '小計：' + formatPrice(subtotal);
+          total += subtotal;
+        });
+
+        if (!hasItems) {
+          cartContent.style.display = 'none';
+          cartEmpty.classList.add('visible');
+        } else {
+          cartContent.style.display = '';
+          cartEmpty.classList.remove('visible');
+        }
+
+        var summaryRows = document.querySelectorAll('.summary-row');
+        summaryRows[0].querySelector('span:last-child').textContent = formatPrice(total);
+        var grandTotal = total + shipping;
+        summaryRows[2].querySelector('.summary-value').textContent = formatPrice(grandTotal);
+      }
+
+      loadCart();
+    })();
+  </script>
+</body>
+</html>

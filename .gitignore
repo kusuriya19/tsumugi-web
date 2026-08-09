@@ -1,0 +1,10 @@
+# 本地開發腳本
+*.bat
+serve.ps1
+
+# 設計文件與素材
+design/
+logo/
+product/
+supabase/
+AI_CONTEXT.md

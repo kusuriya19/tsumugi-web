@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="#7A6556"/>
+  <!-- Mizuhiki Knot Symbol -->
+  <g transform="translate(16, 16)" fill="none" stroke="#F8F4EE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer circle -->
+    <circle r="10"/>
+    <!-- Inner knot pattern -->
+    <path d="M-4 0c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4"/>
+    <!-- Vertical line -->
+    <line y1="-6" y2="6"/>
+    <!-- Horizontal line -->
+    <line x1="-6" y1="0" x2="6" y2="0"/>
+  </g>
+</svg>
