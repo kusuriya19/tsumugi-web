@@ -1484,6 +1484,7 @@ input {
     padding: var(--space-xs);
   }
 
+  .product-info h3,
   .product-name {
     font-size: 0.8125rem;
     line-height: 1.4;
@@ -1824,22 +1825,25 @@ input {
 }
 
 .product-info {
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--space-sm);
 }
 
-.product-info h3 {
+.product-info h3,
+.product-name {
   font-family: var(--font-serif-cn);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 400;
-  color: var(--color-brown);
+  color: var(--color-text);
   margin-bottom: var(--space-xs);
   letter-spacing: 0.04em;
+  line-height: 1.5;
 }
 
 .product-price {
-  font-size: 0.875rem;
-  color: var(--color-gold);
-  font-weight: 400;
+  font-size: 0.9375rem;
+  color: var(--color-brown);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* ============================================
