@@ -169,13 +169,14 @@
 
   <div id="template-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/icons.js"></script>
   <script src="js/templates.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/contact.js"></script>
   <script>
     TSUMUGI.Templates.init('contact.html');
 
-    // Phone input: only allow digits and dashes, max 12 chars
     var phoneInput = document.getElementById('contact-phone');
     if (phoneInput) {
       phoneInput.addEventListener('input', function() {
@@ -188,56 +189,6 @@
         if (!/[0-9\-]/.test(char)) {
           e.preventDefault();
         }
-      });
-    }
-
-    // Contact Form
-    var contactForm = document.getElementById('contactForm');
-    var formStatus = document.getElementById('form-status');
-
-    if (contactForm) {
-      contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        var name = document.getElementById('contact-name').value.trim();
-        var email = document.getElementById('contact-email').value.trim();
-        var phone = document.getElementById('contact-phone').value.trim();
-        var message = document.getElementById('contact-message').value.trim();
-
-        if (!name || !email || !phone || !message) {
-          formStatus.style.display = 'block';
-          formStatus.className = 'form-status form-status--error';
-          formStatus.textContent = '請填寫所有必填欄位。';
-          return;
-        }
-
-        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          formStatus.style.display = 'block';
-          formStatus.className = 'form-status form-status--error';
-          formStatus.textContent = '請輸入正確的電子信箱格式。';
-          return;
-        }
-
-        if (!/^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(phone)) {
-          formStatus.style.display = 'block';
-          formStatus.className = 'form-status form-status--error';
-          formStatus.textContent = '電話格式不正確，請輸入如 0912-345-678。';
-          return;
-        }
-
-        var submitBtn = contactForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.textContent = '傳送中...';
-
-        setTimeout(function() {
-          formStatus.style.display = 'block';
-          formStatus.className = 'form-status form-status--success';
-          formStatus.textContent = '訊息已送出！我們將盡快與您聯繫。';
-          contactForm.reset();
-          submitBtn.disabled = false;
-          submitBtn.textContent = '送出訊息';
-        }, 1200);
       });
     }
   </script>
