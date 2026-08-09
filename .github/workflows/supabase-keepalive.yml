@@ -1,0 +1,20 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # 每 6 天執行一次（避免 7 天不活動進入休眠）
+    - cron: '0 0 */6 * *'
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          echo "Pinging Supabase to keep it alive..."
+          curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/"
+          echo ""
+          echo "Supabase ping completed at $(date)"
