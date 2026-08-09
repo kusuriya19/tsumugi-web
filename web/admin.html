@@ -66,6 +66,65 @@
       display: none;
     }
 
+    /* Tabs */
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--color-gray-light);
+      padding-bottom: 0;
+    }
+    .admin-tab {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .admin-tab:hover {
+      color: var(--color-brown);
+    }
+    .admin-tab.active {
+      color: var(--color-brown);
+      border-bottom-color: var(--color-brown);
+      font-weight: 500;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Member Table */
+    .member-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-cream-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-brown);
+    }
+    .member-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .member-name {
+      font-weight: 500;
+    }
+    .member-email {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+
     /* Dashboard */
     .admin-dashboard {
       max-width: 1100px;
@@ -396,54 +455,94 @@
     <!-- Dashboard Section -->
     <section class="admin-dashboard" id="dashboardSection" style="display:none;">
       <div class="admin-header">
-        <h1>諮詢管理</h1>
+        <h1>後臺管理</h1>
         <button class="btn-logout" id="btnLogout">登出</button>
       </div>
-      <div class="admin-stats">
-        <div class="stat-card">
-          <div class="stat-number" id="statTotal">0</div>
-          <div class="stat-label">總提交數</div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="contacts">諮詢管理</button>
+        <button class="admin-tab" data-tab="members">會員管理</button>
+      </div>
+
+      <!-- 諮詢管理 Tab -->
+      <div class="tab-content active" id="tab-contacts">
+        <div class="admin-stats">
+          <div class="stat-card">
+            <div class="stat-number" id="statTotal">0</div>
+            <div class="stat-label">總提交數</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statToday">0</div>
+            <div class="stat-label">今日新增</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statPending">0</div>
+            <div class="stat-label">待處理</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statProcessing">0</div>
+            <div class="stat-label">處理中</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-number" id="statToday">0</div>
-          <div class="stat-label">今日新增</div>
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label>狀態篩選：</label>
+            <button class="filter-btn active" data-status="all">全部</button>
+            <button class="filter-btn" data-status="pending">待處理</button>
+            <button class="filter-btn" data-status="processing">處理中</button>
+            <button class="filter-btn" data-status="replied">已回覆</button>
+            <button class="filter-btn" data-status="closed">已結案</button>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-number" id="statPending">0</div>
-          <div class="stat-label">待處理</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="statProcessing">0</div>
-          <div class="stat-label">處理中</div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>信箱</th>
+                <th>主題</th>
+                <th>狀態</th>
+                <th>內容摘要</th>
+                <th>提交時間</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsBody">
+              <tr><td colspan="7" class="admin-loading">載入中...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="filter-bar">
-        <div class="filter-group">
-          <label>狀態篩選：</label>
-          <button class="filter-btn active" data-status="all">全部</button>
-          <button class="filter-btn" data-status="pending">待處理</button>
-          <button class="filter-btn" data-status="processing">處理中</button>
-          <button class="filter-btn" data-status="replied">已回覆</button>
-          <button class="filter-btn" data-status="closed">已結案</button>
+
+      <!-- 會員管理 Tab -->
+      <div class="tab-content" id="tab-members">
+        <div class="admin-stats">
+          <div class="stat-card">
+            <div class="stat-number" id="statMemberTotal">0</div>
+            <div class="stat-label">總會員數</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statMemberToday">0</div>
+            <div class="stat-label">今日新增</div>
+          </div>
         </div>
-      </div>
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>姓名</th>
-              <th>信箱</th>
-              <th>主題</th>
-              <th>狀態</th>
-              <th>內容摘要</th>
-              <th>提交時間</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="submissionsBody">
-            <tr><td colspan="7" class="admin-loading">載入中...</td></tr>
-          </tbody>
-        </table>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>會員</th>
+                <th>信箱</th>
+                <th>電話</th>
+                <th>生日</th>
+                <th>註冊時間</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="membersBody">
+              <tr><td colspan="6" class="admin-loading">載入中...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -492,6 +591,36 @@
         <div style="display:flex;gap:12px;margin-top:24px;">
           <button class="btn-close" id="btnSaveDetail" style="flex:1;">儲存</button>
           <button class="btn-close" id="btnCloseModal" style="flex:1;background:var(--color-gray);">關閉</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Detail Modal -->
+    <div class="modal-overlay" id="memberModalOverlay">
+      <div class="modal">
+        <h2>會員詳情</h2>
+        <div class="detail-row">
+          <span class="detail-label">姓名</span>
+          <span class="detail-value" id="memberDetailName"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">信箱</span>
+          <span class="detail-value" id="memberDetailEmail"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">電話</span>
+          <span class="detail-value" id="memberDetailPhone"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">生日</span>
+          <span class="detail-value" id="memberDetailBirthday"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">註冊時間</span>
+          <span class="detail-value" id="memberDetailDate"></span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:24px;">
+          <button class="btn-close" id="btnCloseMemberModal" style="flex:1;background:var(--color-gray);">關閉</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 /**
  * 紬 TSUMUGI — Admin Dashboard
- * 後臺管理：登入、查看諮詢提交記錄、狀態管理
+ * 後臺管理：登入、諮詢管理、會員管理
  */
 
 (function () {
@@ -13,9 +13,14 @@
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtyd3VwdmFnampmc3JxeGNmanNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2NDE5NjgsImV4cCI6MjEwMTIxNzk2OH0.X0_QQT9ZTdxVm_qCBeqHueSwzUjVASFpWkW9UJoBoiQ';
 
   var supabase = null;
-  var allData = [];
+
+  // 諮詢資料
+  var allSubmissions = [];
   var currentFilter = 'all';
   var currentDetailId = null;
+
+  // 會員資料
+  var allMembers = [];
 
   // 狀態對照
   var statusMap = {
@@ -38,9 +43,11 @@
   // ============================================
   var loginSection, dashboardSection;
   var loginForm, loginError;
-  var submissionsBody, btnLogout;
+  var submissionsBody, membersBody, btnLogout;
   var statTotal, statToday, statPending, statProcessing;
+  var statMemberTotal, statMemberToday;
   var modalOverlay, btnCloseModal, btnSaveDetail;
+  var memberModalOverlay, btnCloseMemberModal;
 
   // ============================================
   // 初始化
@@ -58,21 +65,46 @@
     loginForm = document.getElementById('loginForm');
     loginError = document.getElementById('loginError');
     submissionsBody = document.getElementById('submissionsBody');
+    membersBody = document.getElementById('membersBody');
     btnLogout = document.getElementById('btnLogout');
     statTotal = document.getElementById('statTotal');
     statToday = document.getElementById('statToday');
     statPending = document.getElementById('statPending');
     statProcessing = document.getElementById('statProcessing');
+    statMemberTotal = document.getElementById('statMemberTotal');
+    statMemberToday = document.getElementById('statMemberToday');
     modalOverlay = document.getElementById('modalOverlay');
     btnCloseModal = document.getElementById('btnCloseModal');
     btnSaveDetail = document.getElementById('btnSaveDetail');
+    memberModalOverlay = document.getElementById('memberModalOverlay');
+    btnCloseMemberModal = document.getElementById('btnCloseMemberModal');
 
     loginForm.addEventListener('submit', handleLogin);
     btnLogout.addEventListener('click', handleLogout);
     btnCloseModal.addEventListener('click', closeModal);
     btnSaveDetail.addEventListener('click', handleSaveDetail);
+    btnCloseMemberModal.addEventListener('click', closeMemberModal);
     modalOverlay.addEventListener('click', function (e) {
       if (e.target === modalOverlay) closeModal();
+    });
+    memberModalOverlay.addEventListener('click', function (e) {
+      if (e.target === memberModalOverlay) closeMemberModal();
+    });
+
+    // Tab 切換
+    document.querySelectorAll('.admin-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.admin-tab').forEach(function (t) {
+          t.classList.remove('active');
+        });
+        tab.classList.add('active');
+
+        var tabName = tab.getAttribute('data-tab');
+        document.querySelectorAll('.tab-content').forEach(function (content) {
+          content.classList.remove('active');
+        });
+        document.getElementById('tab-' + tabName).classList.add('active');
+      });
     });
 
     // 篩選按鈕
@@ -82,7 +114,7 @@
         filterBtns.forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
         currentFilter = btn.getAttribute('data-status');
-        renderTable();
+        renderSubmissions();
       });
     });
 
@@ -145,7 +177,7 @@
   async function showDashboard() {
     loginSection.style.display = 'none';
     dashboardSection.style.display = '';
-    await loadSubmissions();
+    await Promise.all([loadSubmissions(), loadMembers()]);
   }
 
   // ============================================
@@ -164,39 +196,39 @@
       return;
     }
 
-    allData = data || [];
-    updateStats();
-    renderTable();
+    allSubmissions = data || [];
+    updateSubmissionStats();
+    renderSubmissions();
   }
 
   // ============================================
-  // 更新統計
+  // 更新諮詢統計
   // ============================================
-  function updateStats() {
-    statTotal.textContent = allData.length;
+  function updateSubmissionStats() {
+    statTotal.textContent = allSubmissions.length;
 
     var today = new Date().toISOString().split('T')[0];
-    var todayCount = allData.filter(function (item) {
+    var todayCount = allSubmissions.filter(function (item) {
       return item.created_at && item.created_at.startsWith(today);
     }).length;
     statToday.textContent = todayCount;
 
-    statPending.textContent = allData.filter(function (item) {
+    statPending.textContent = allSubmissions.filter(function (item) {
       return item.status === 'pending' || !item.status;
     }).length;
 
-    statProcessing.textContent = allData.filter(function (item) {
+    statProcessing.textContent = allSubmissions.filter(function (item) {
       return item.status === 'processing';
     }).length;
   }
 
   // ============================================
-  // 渲染表格
+  // 渲染諮詢表格
   // ============================================
-  function renderTable() {
+  function renderSubmissions() {
     var filtered = currentFilter === 'all'
-      ? allData
-      : allData.filter(function (item) {
+      ? allSubmissions
+      : allSubmissions.filter(function (item) {
           return (item.status || 'pending') === currentFilter;
         });
 
@@ -252,20 +284,19 @@
       return;
     }
 
-    // 更新本地資料
-    var item = allData.find(function (d) { return d.id === id; });
+    var item = allSubmissions.find(function (d) { return d.id === id; });
     if (item) item.status = nextStatus;
 
-    updateStats();
-    renderTable();
+    updateSubmissionStats();
+    renderSubmissions();
   }
 
   // ============================================
-  // 開啟詳情 Modal
+  // 開啟諮詢詳情 Modal
   // ============================================
   function openDetail(id) {
     currentDetailId = id;
-    var item = allData.find(function (d) { return d.id === id; });
+    var item = allSubmissions.find(function (d) { return d.id === id; });
     if (!item) return;
 
     document.getElementById('detailName').textContent = item.name || '-';
@@ -283,7 +314,7 @@
   }
 
   // ============================================
-  // 儲存詳情
+  // 儲存諮詢詳情
   // ============================================
   async function handleSaveDetail() {
     if (!currentDetailId) return;
@@ -308,20 +339,19 @@
       return;
     }
 
-    // 更新本地資料
-    var item = allData.find(function (d) { return d.id === currentDetailId; });
+    var item = allSubmissions.find(function (d) { return d.id === currentDetailId; });
     if (item) {
       item.status = status;
       item.note = note;
     }
 
-    updateStats();
-    renderTable();
+    updateSubmissionStats();
+    renderSubmissions();
     closeModal();
   }
 
   // ============================================
-  // 刪除記錄
+  // 刪除諮詢記錄
   // ============================================
   async function deleteItem(id) {
     if (!confirm('確定要刪除此筆記錄嗎？')) return;
@@ -336,17 +366,113 @@
       return;
     }
 
-    allData = allData.filter(function (d) { return d.id !== id; });
-    updateStats();
-    renderTable();
+    allSubmissions = allSubmissions.filter(function (d) { return d.id !== id; });
+    updateSubmissionStats();
+    renderSubmissions();
   }
 
   // ============================================
-  // 關閉 Modal
+  // 關閉諮詢 Modal
   // ============================================
   function closeModal() {
     modalOverlay.classList.remove('active');
     currentDetailId = null;
+  }
+
+  // ============================================
+  // 載入會員資料
+  // ============================================
+  async function loadMembers() {
+    membersBody.innerHTML = '<tr><td colspan="6" class="admin-loading">載入中...</td></tr>';
+
+    var { data, error } = await supabase
+      .from('members')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      membersBody.innerHTML = '<tr><td colspan="6" class="admin-loading">載入失敗：' + error.message + '</td></tr>';
+      return;
+    }
+
+    allMembers = data || [];
+    updateMemberStats();
+    renderMembers();
+  }
+
+  // ============================================
+  // 更新會員統計
+  // ============================================
+  function updateMemberStats() {
+    statMemberTotal.textContent = allMembers.length;
+
+    var today = new Date().toISOString().split('T')[0];
+    var todayCount = allMembers.filter(function (item) {
+      return item.created_at && item.created_at.startsWith(today);
+    }).length;
+    statMemberToday.textContent = todayCount;
+  }
+
+  // ============================================
+  // 渲染會員表格
+  // ============================================
+  function renderMembers() {
+    if (allMembers.length === 0) {
+      membersBody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>目前沒有會員資料</p></td></tr>';
+      return;
+    }
+
+    var html = allMembers.map(function (item) {
+      var date = item.created_at
+        ? new Date(item.created_at).toLocaleString('zh-TW')
+        : '-';
+      var birthday = item.birthday || '-';
+      var phone = item.phone || '未提供';
+      var initial = (item.name || '?').charAt(0).toUpperCase();
+
+      return '<tr>' +
+        '<td>' +
+          '<div class="member-info">' +
+            '<div class="member-avatar">' + escapeHtml(initial) + '</div>' +
+            '<span class="member-name">' + escapeHtml(item.name) + '</span>' +
+          '</div>' +
+        '</td>' +
+        '<td class="col-email">' + escapeHtml(item.email) + '</td>' +
+        '<td>' + escapeHtml(phone) + '</td>' +
+        '<td>' + birthday + '</td>' +
+        '<td class="col-date">' + date + '</td>' +
+        '<td>' +
+          '<button class="action-btn" onclick="window.ADMIN.openMemberDetail(\'' + item.id + '\')">詳情</button>' +
+        '</td>' +
+        '</tr>';
+    }).join('');
+
+    membersBody.innerHTML = html;
+  }
+
+  // ============================================
+  // 開啟會員詳情 Modal
+  // ============================================
+  function openMemberDetail(id) {
+    var item = allMembers.find(function (d) { return d.id === id; });
+    if (!item) return;
+
+    document.getElementById('memberDetailName').textContent = item.name || '-';
+    document.getElementById('memberDetailEmail').textContent = item.email || '-';
+    document.getElementById('memberDetailPhone').textContent = item.phone || '未提供';
+    document.getElementById('memberDetailBirthday').textContent = item.birthday || '未設定';
+    document.getElementById('memberDetailDate').textContent = item.created_at
+      ? new Date(item.created_at).toLocaleString('zh-TW')
+      : '-';
+
+    memberModalOverlay.classList.add('active');
+  }
+
+  // ============================================
+  // 關閉會員 Modal
+  // ============================================
+  function closeMemberModal() {
+    memberModalOverlay.classList.remove('active');
   }
 
   // ============================================
@@ -364,5 +490,6 @@
     changeStatus: changeStatus,
     openDetail: openDetail,
     deleteItem: deleteItem,
+    openMemberDetail: openMemberDetail,
   };
 })();
