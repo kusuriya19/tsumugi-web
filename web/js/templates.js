@@ -55,7 +55,7 @@ TSUMUGI.Templates = {
       '  <header class="site-header" id="header">\n' +
       '    <div class="header-inner">\n' +
       '      <a href="index.html" class="logo">\n' +
-      '        <img src="asset/logo.png" alt="紬 TSUMUGI" class="logo-img">\n' +
+      '        <img src="asset/LOGO.png" alt="紬 TSUMUGI" class="logo-img">\n' +
       '      </a>\n' +
       '      <nav class="main-nav" id="mainNav" aria-label="主導覽">\n' +
       '        <ul class="nav-list">\n' +
@@ -100,7 +100,7 @@ TSUMUGI.Templates = {
       '        <div class="footer-grid">\n' +
       '          <div class="footer-brand">\n' +
       '            <a href="index.html" class="footer-logo-link">\n' +
-      '              <img src="asset/logo.png" alt="紬 TSUMUGI" class="footer-logo">\n' +
+      '              <img src="asset/LOGO.png" alt="紬 TSUMUGI" class="footer-logo">\n' +
       '            </a>\n' +
       '            <p class="footer-tagline">把祝福，編織成日常。</p>\n' +
       '            <p class="footer-subtitle">日本水引文化 × 職人工藝 × 日常美學</p>\n' +
