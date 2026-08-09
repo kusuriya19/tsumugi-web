@@ -120,6 +120,43 @@
       margin-top: 4px;
     }
 
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-bar .filter-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .filter-bar label {
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+    }
+    .filter-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--color-gray);
+      border-radius: 20px;
+      background: var(--color-white);
+      font-size: 0.8rem;
+      color: var(--color-text-light);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .filter-btn:hover {
+      border-color: var(--color-brown);
+      color: var(--color-brown);
+    }
+    .filter-btn.active {
+      background: var(--color-brown);
+      border-color: var(--color-brown);
+      color: var(--color-white);
+    }
+
     /* Table */
     .admin-table-wrap {
       background: var(--color-white);
@@ -146,7 +183,7 @@
       padding: 16px 20px;
       font-size: 0.9rem;
       border-bottom: 1px solid var(--color-gray-light);
-      vertical-align: top;
+      vertical-align: middle;
     }
     .admin-table tr:last-child td {
       border-bottom: none;
@@ -157,7 +194,7 @@
     .admin-table .col-name { font-weight: 500; }
     .admin-table .col-email { color: var(--color-text-light); }
     .admin-table .col-message {
-      max-width: 280px;
+      max-width: 200px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -170,6 +207,89 @@
       background: var(--color-cream-dark);
       border-radius: 20px;
       font-size: 0.8rem;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+    .status-badge:hover {
+      transform: scale(1.05);
+    }
+    .status-pending {
+      background: #FFF3E0;
+      color: #E65100;
+    }
+    .status-processing {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
+    .status-replied {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+    .status-closed {
+      background: #F5F5F5;
+      color: #757575;
+    }
+
+    /* Status Dropdown */
+    .status-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 100;
+      display: none;
+      min-width: 120px;
+    }
+    .status-dropdown.show {
+      display: block;
+    }
+    .status-dropdown-item {
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .status-dropdown-item:hover {
+      background: var(--color-cream);
+    }
+    .status-dropdown-item.active {
+      color: var(--color-brown);
+      font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--color-gray);
+      border-radius: var(--radius-sm);
+      background: var(--color-white);
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-right: 4px;
+    }
+    .action-btn:hover {
+      border-color: var(--color-brown);
+      color: var(--color-brown);
+    }
+    .action-btn.delete:hover {
+      border-color: #c62828;
+      color: #c62828;
     }
 
     /* Detail Modal */
@@ -288,6 +408,24 @@
           <div class="stat-number" id="statToday">0</div>
           <div class="stat-label">今日新增</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statPending">0</div>
+          <div class="stat-label">待處理</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statProcessing">0</div>
+          <div class="stat-label">處理中</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>狀態篩選：</label>
+          <button class="filter-btn active" data-status="all">全部</button>
+          <button class="filter-btn" data-status="pending">待處理</button>
+          <button class="filter-btn" data-status="processing">處理中</button>
+          <button class="filter-btn" data-status="replied">已回覆</button>
+          <button class="filter-btn" data-status="closed">已結案</button>
+        </div>
       </div>
       <div class="admin-table-wrap">
         <table class="admin-table">
@@ -296,12 +434,14 @@
               <th>姓名</th>
               <th>信箱</th>
               <th>主題</th>
+              <th>狀態</th>
               <th>內容摘要</th>
               <th>提交時間</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody id="submissionsBody">
-            <tr><td colspan="5" class="admin-loading">載入中...</td></tr>
+            <tr><td colspan="7" class="admin-loading">載入中...</td></tr>
           </tbody>
         </table>
       </div>
@@ -332,7 +472,27 @@
           <span class="detail-value" id="detailDate"></span>
         </div>
         <div class="detail-message" id="detailMessage"></div>
-        <button class="btn-close" id="btnCloseModal">關閉</button>
+        <div class="detail-row" style="margin-top:16px;">
+          <span class="detail-label">處理狀態</span>
+          <span class="detail-value">
+            <select id="detailStatus" style="padding:6px 12px;border:1px solid var(--color-gray);border-radius:var(--radius-sm);font-size:0.9rem;">
+              <option value="pending">待處理</option>
+              <option value="processing">處理中</option>
+              <option value="replied">已回覆</option>
+              <option value="closed">已結案</option>
+            </select>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">管理員備註</span>
+          <span class="detail-value">
+            <textarea id="detailNote" rows="3" style="width:100%;padding:8px 12px;border:1px solid var(--color-gray);border-radius:var(--radius-sm);font-size:0.9rem;resize:vertical;" placeholder="輸入內部備註..."></textarea>
+          </span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:24px;">
+          <button class="btn-close" id="btnSaveDetail" style="flex:1;">儲存</button>
+          <button class="btn-close" id="btnCloseModal" style="flex:1;background:var(--color-gray);">關閉</button>
+        </div>
       </div>
     </div>
   </main>
